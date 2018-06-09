@@ -2,36 +2,44 @@
 # Nathan Greene
 # Summer 2018
 #
-# This script simulates Langton's ant. The ant moves under the following rules:
-# 	+ If the ant is on a 0 square, turn right, move forward, and set the space
-#	to 1.
-#	+ If the ant is on a 1 square, turn left, move forward, and set the space to
-#	0.
+# This script simulates Langton's ant.
 #
 # Source:  https://www.futilitycloset.com/2014/04/06/langtons-ant/
 
-#import itertools.cycle
+import random
 import sys
 import time
 
 def main():
-	LA = LangtonsAnt(10, 0)
+	LA = LangtonsAnt(10, "empty")
 	LA.run(iters=10000, sleeptime=0.2)
-	#for i in range(10000):
-	#	LA.move()
-	#	print(LA)
-	#	print("\n\nIteration: {0}\n".format(i))
 
 class LangtonsAnt:
-	def __init__(self, dims=10, setup=0):
+	"""
+		Langton's ant consists of an ant as a point within an n-dimensional grid
+	 	with direction. If the ant is on a blank square, it turns right, then
+		moves forward. Otherwise, the ant turns left, then moves forward. In
+		each case, the abandoned square is inverted.
+	"""
+
+	def __init__(self, dims=10, setup="empty"):
+		""" Initialize the ant and grid (world, board, etc.) """
 		if 1 < dims:
 			self.dims = dims
-			if setup == 0:
+			if setup == "empty":
 				self.ant = {"x": dims // 2, "y": dims // 2, "state": " ", "facing": "up"}
 				self.board = [[" " for i in range(dims)] for j in range(dims)]
 				self.board[self.ant["x"]][self.ant["y"]] = "X"
+			elif setup == "random":
+				self.ant = {"x": dims // 2, "y": dims // 2, "state": " ", "facing": "up"}
+				self.board = [[random.choice([" ", "."]) for i in range(dims)] for j in range(dims)]
+				self.board[self.ant["x"]][self.ant["y"]] = "X"
 
 	def __str__(self):
+		"""
+		 	Returns a string representing the current state of the ant on the
+			board.
+		"""
 		s = ""
 		for i in range(self.dims):
 			for j in range(self.dims):
@@ -40,6 +48,7 @@ class LangtonsAnt:
 		return s
 
 	def move(self):
+		""" Move the ant according to the ant in its current state of the board. """
 		if self.ant["state"] == " ":
 			self.board[self.ant["x"]][self.ant["y"]] = "."
 			if self.ant["facing"] == "up":
@@ -74,6 +83,10 @@ class LangtonsAnt:
 		self.board[self.ant["x"]][self.ant["y"]] = "X"
 
 	def run(self, iters, sleeptime=0.2):
+		"""
+		 	Move a number of steps displaying each state. Choose a smaller
+			sleeptime to increase the rate of change.
+		"""
 		if iters * sleeptime > 0:
 			for i in range(iters):
 				self.move()
